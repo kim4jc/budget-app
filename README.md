@@ -7,7 +7,7 @@ This repository contains three parts:
 
 ## Getting Started
 
-### 1. Install dependencies for all parts (do not copy the ```bash):
+### 1. Install dependencies for all parts:
 
 ```bash
 cd client
