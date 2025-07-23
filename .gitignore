@@ -1,0 +1,26 @@
+# Node modules for all subprojects
+client/node_modules/
+server/node_modules/
+desktop/node_modules/
+
+#.env for all subprojects
+client/.env
+server/.env
+desktop/.env
+
+# Build output
+client/dist/
+desktop/out/
+server/build/
+
+# Logs
+*.log
+
+# OS / Editor junk
+.DS_Store
+.env
+.env.local
+.vscode/
+
+# Electron specific
+desktop/*.asar
