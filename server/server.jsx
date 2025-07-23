@@ -1,16 +1,21 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const dotenv = require('dotenv');
 
+const authRoutes = require('../routes/authRoutes');
+
+dotenv.config();
 const app = express();
-const PORT = 3000;
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_API_URL }));
 app.use(express.json());
+app.use(cookieParser());
 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Hello from server!' });
-});
+// Mount auth routes at /api/auth
+app.use('/api/auth', authRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// ...mount other route groups similarly
+
+const PORT = process.env.BACKEND_PORT || 4000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
