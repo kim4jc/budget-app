@@ -16,6 +16,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 
 // ...mount other route groups similarly
+app.use('/bins', require('./routes/binRoutes'));
 
 const PORT = process.env.BACKEND_PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

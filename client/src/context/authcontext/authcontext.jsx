@@ -5,7 +5,12 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     // Mock user state: null means logged out, object means logged in
     //later on (when DB and login implemented) we can take the username from JWT
-    const [user, setUser] = useState({ username: 'testUsername' });
+    const [user, setUser] = useState({ 
+      username: 'testUsername',
+      expenses: [],
+      bins: [],
+      income: []
+     });
   
     // Mock login/logout/register functions (implement properly later)
     const login = (username, password) => {
@@ -45,7 +50,7 @@ export function AuthProvider({ children }) {
 
   
     return (
-      <AuthContext.Provider value={{ user, login, logout, register}}>
+      <AuthContext.Provider value={{ user, setUser, login, logout, register}}>
         {children}
       </AuthContext.Provider>
     );
