@@ -12,8 +12,8 @@ export default function Navbar() {
         <div className="flex space-x-4 w-7/10">
             <Link to="/" className="hover:underline">Home</Link>
             <Link to ="/expenses" className="hover:underline">Expenses</Link>
-            <Link to ="/spending" className="hover:underline">Spending</Link>
             <Link to ="/data" className="hover:underline">Data</Link>
+            <Link to="/spending" className="hover:underline">Bins</Link>
         </div>
         
 
