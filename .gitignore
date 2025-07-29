@@ -24,3 +24,6 @@ server/build/
 
 # Electron specific
 desktop/*.asar
+
+# Database
+database.sqlite
