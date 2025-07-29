@@ -3,7 +3,9 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 
-const authRoutes = require('../routes/authRoutes');
+const sequelize = require('./config/database'); // Ensure this file exists
+require('./models/user'); // Register User model with Sequelize
+const authRoutes = require('./routes/authRoutes'); // Fix path to match folder
 
 dotenv.config();
 const app = express();
@@ -12,11 +14,15 @@ app.use(cors({ credentials: true, origin: process.env.FRONTEND_API_URL }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Mount auth routes at /api/auth
+// Routes
 app.use('/api/auth', authRoutes);
 
-// ...mount other route groups similarly
-app.use('/bins', require('./routes/binRoutes'));
-
-const PORT = process.env.BACKEND_PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Sync database and start server
+sequelize.sync().then(() => {
+  const PORT = process.env.BACKEND_PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Server running and database synced on port ${PORT}`);
+  });
+}).catch((err) => {
+  console.error('Failed to sync database:', err);
+});
