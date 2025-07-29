@@ -48,15 +48,15 @@ export default function ExpensesPage() {
     };
 
     return (
-        <div className="flex w-full flex-col md:flex-row h-screen p-4 gap-4">
+        <div className="flex flex-col md:flex-row bg-gray-100 font-sans min-h-screen p-8 mt-5 gap-4">
             {/* Income list */}
-            <div className="flex-1 max-w-xl w-full m-auto p-4 border-2 bg-gray-100 rounded flex-flex-col">
-                <h1 className="text-2xl font-bold mb-4 text-center">Income</h1>
+            <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
+                <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Income</h1>
                 <ul className="flex-1 mb-4 space-y-2">
                     {income.map((inc, idx) => (
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${income.length > 0 ? 
-                            'border pd-2 px-2 rounded' : ''}`
+                            'border-b border-dashed border-gray-300 py-2 text-lg' : ''}`
                         }>
                             <span>{inc.name} ${inc.amount}</span>
                             <button
@@ -68,12 +68,12 @@ export default function ExpensesPage() {
                     ))}
                 </ul>
                 {/* Income Input */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pb-2">
                     <input
                         value={incomeName}
                         onChange={(e) => setIncomeName(e.target.value)}
                         placeholder="Income Name"
-                        className="border p-2 rounded flex-1"
+                        className="border border-gray-200 p-2 rounded min-w-0 flex-grow"
                         maxLength={20}
                     />
                     <input
@@ -81,7 +81,7 @@ export default function ExpensesPage() {
                         onChange={(e) => setIncomeAmount(e.target.value)}
                         placeholder="Amount"
                         type="number"
-                        className="border p-2 rounded w-28"
+                        className="border border-gray-200 p-2 rounded w-28"
                     />
                     <button
                         onClick={handleAddIncome}
@@ -92,13 +92,13 @@ export default function ExpensesPage() {
             </div>
 
             {/* Expenses list */}
-            <div className="flex-1 max-w-xl w-full m-auto p-4 border-2 bg-gray-100 rounded flex-flex-col">
-                <h1 className="text-2xl font-bold mb-4 text-center">Expenses</h1>
-                <ul className="flex-1 mb-4 space-y-2">
+            <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
+                <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Expenses</h1>
+                <ul className=" mb-4 space-y-2">
                     {expenses.map((exp, idx) => (
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${expenses.length > 0 ? 
-                            'border pd-2 px-2 rounded' : ''}`
+                            'border-b border-dashed border-gray-300 py-2 text-lg' : ''}`
                         }>
                             <span>{exp.name} -${exp.amount}</span>
                             <button
@@ -110,12 +110,12 @@ export default function ExpensesPage() {
                     ))}
                 </ul>
                 {/* Expense Input */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pb-2">
                     <input
                         value={expenseName}
                         onChange={(e) => setExpenseName(e.target.value)}
                         placeholder="Expense Name"
-                        className="border p-2 rounded flex-1"
+                        className="border border-gray-200 p-2 rounded min-w-0 flex-grow"
                         maxLength={20}
                     />
                     <input
@@ -123,7 +123,7 @@ export default function ExpensesPage() {
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="Amount"
                         type="number"
-                        className="border p-2 rounded w-28"
+                        className="border border-gray-200 p-2 rounded w-28"
                     />
                     <button
                         onClick={handleAddExpense}

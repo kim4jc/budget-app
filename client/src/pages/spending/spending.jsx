@@ -89,11 +89,11 @@ export default function BinsPage() {
     }
 
     return (
-        <div className="min-h-screen p-4 flex font-sans bg-gray-100 text-gray-800 mt-5">
+        <div className="min-h-screen p-8 flex flex-col md:flex-row font-sans bg-gray-100 text-gray-800 mt-5 gap-4">
           {/*Bin display and management*/}
-            <div className="flex-1/2 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
+            <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
                 <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Your Bins</h1>
-                <ul className="flex-1 mb-4 space-y-2">
+                <ul className=" mb-4 space-y-2">
                     {bins.map((bin, idx) => (
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${bins.length > 0 ? 
@@ -132,7 +132,7 @@ export default function BinsPage() {
             </div>
             
             {/* pie chart */}
-            <div className="flex-1/3 max-w-xl w-full m-auto p-4 rounded flex flex-col bg-white rounded-lg shadow-md">
+            <div className="flex-1 max-w-xl w-full m-auto p-4 rounded flex flex-col bg-white rounded-lg shadow-md">
                 <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Graph</h1>
                 {bins.length > 0 ? (
                     <div className="w-80 h-80 mx-auto py-2">
