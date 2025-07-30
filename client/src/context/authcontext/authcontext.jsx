@@ -3,54 +3,70 @@ import { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    // Mock user state: null means logged out, object means logged in
-    //later on (when DB and login implemented) we can take the username from JWT
-    const [user, setUser] = useState({ 
-      username: 'testUsername',
-      expenses: [],
-      bins: [],
-      income: []
-     });
+
+    const [user, setUser] = useState(null);
   
-    // Mock login/logout/register functions (implement properly later)
-    const login = (username, password) => {
-        try {
-            if (username && password) {
-              setUser({ username });
-              return true;
-            }
-            return false;
-        } 
-        catch (error) {
-            console.error('Login error:', error);
-            return false;
-        }
+    const login = async (username, password) => {
+      //call backend endpoint to login user
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json' 
+        },
+        credentials: 'include', // must include credentials to send and receive cookies
+        body: JSON.stringify({ username, password }), //send username and password in request body as a json object
+      });
+
+      //if not a response status in 200s then error
+      if (!res.ok) {
+        //throw error from response
+        const error = await res.json();
+        throw new Error(error.error || 'Login failed');
+      }
+  
+      const data = await res.json();
+      setUser({ username: data.username });
+      return data;
     };
 
 
-    const logout = () => {
-        //later implement cookie clearing
-        setUser(null);
-    }
+    const logout = async () => {
+      //call backend for logout (this clears cookies)
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setUser(null);
+      //return the response (successful logout msg)
+      return await res.json()
+    };
 
 
-    const register = (username, password) => {
-        try {
-            if (username && password) {
-              setUser({ username });
-              return true;
-            }
-            return false;
-        } 
-        catch (error) {
-            console.error('Register error:', error);
-            return false;
-        }
+    const register = async (username, password) => {
+      //call backend endpoint to register user
+      console.log(import.meta.env.VITE_API_URL)
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      //if not a response status in 200s then error
+      if (!res.ok) {
+        //throw error from response
+        const error = await res.json();
+        throw new Error(error.error || 'Registration failed');
+      }
+
+      //return the response (success msg)
+      return await res.json();
     };
 
   
     return (
-      <AuthContext.Provider value={{ user, setUser, login, logout, register}}>
+      <AuthContext.Provider value={{ user, login, logout, register}}>
         {children}
       </AuthContext.Provider>
     );

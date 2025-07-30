@@ -14,32 +14,46 @@ export default function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const action = e.nativeEvent.submitter.name; // gets name of the button clicked
-    
-        if (action === 'login') {
-            const success = await login(username, password);
-            if (!success){
-                alert('Login failed')
-            }
-            else{
-                alert('Login Successful')
-                navigate('/');
-            }
-        } 
-        else if (action === 'register') {
-          const success = await register(username, password);
-            if (!success){
-                alert('Registration failed')
-            }
-            else{
-                alert('Registration Successful')
-                const loginSuccess = await login(username, password);
-                    if (loginSuccess) {
+        try{
+            //if trying to login
+            if (action === 'login') {
+                const loginData = await login(username, password);
+                console.log('Login response:', loginData);
+
+                if (!loginData){
+                    alert('Login failed')
+                }
+                else{
+                    //if successful navigate to home
+                    alert('Login Successful')
                     navigate('/');
-                    } 
-                    else {
-                        alert('Auto-login after registration failed. Please try logging in.');
-                    }
+                }
+            } 
+            //if trying to register
+            else if (action === 'register') {
+              const regResponse = await register(username, password);
+              console.log('Registration response:', regResponse);
+
+                if (!regResponse){
+                    alert('Registration failed')
+                }
+                //if successful call the login after registration and navigate to home
+                else{
+                    alert('Registration Successful')
+                    const loginData = await login(username, password);
+                    console.log('Auto-login after register response:', loginData);
+                    if(loginData){
+                        navigate('/');
+                        } 
+                        else {
+                            alert('Auto-login after registration failed. Please try logging in.');
+                        }
+                }
             }
+        }
+        catch(err){
+            console.error('Error: ', err);
+            alert(err.message || 'Something went wrong');
         }
     };
     
