@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
@@ -24,6 +25,7 @@ fs.readdirSync(__dirname)
     );
     db[model.name] = model;
   });
+
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

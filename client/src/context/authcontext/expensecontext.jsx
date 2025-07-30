@@ -1,10 +1,12 @@
 import { createContext, useContext, useState } from 'react';
+
 import { useAuth } from '../authcontext/authcontext.jsx';
 
 const ExpenseContext = createContext();
 
 export function ExpenseProvider({children}) {
     const { user, setUser } = useAuth();
+
     const [expenses, setExpenses] = useState(user?.expenses ?? []);
 
     const addExpense = async (name, amount) => {
@@ -33,6 +35,7 @@ export function ExpenseProvider({children}) {
 
     return (
         <ExpenseContext.Provider value={{ expenses, addExpense, removeExpense }}>
+
             {children}
         </ExpenseContext.Provider>
     );
@@ -40,4 +43,6 @@ export function ExpenseProvider({children}) {
 
 export function useExpenses() {
     return useContext(ExpenseContext)
+
 }
+

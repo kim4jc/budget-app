@@ -70,7 +70,14 @@ export default function BinsPage() {
     };
 
     const options = {
+
+        responsive: true,
         plugins: {
+            legend: {
+                desiplay: true,
+                position: 'bottom',
+            },
+
             tooltip: {
                 callbacks: {
                     label: function(context) {
@@ -84,15 +91,17 @@ export default function BinsPage() {
     }
 
     return (
-        <div className="h-screen w-full flex flex-col md:flex-row p-4 gap-4">
+
+        <div className="min-h-screen p-8 flex flex-col md:flex-row font-sans bg-gray-100 text-gray-800 mt-5 gap-4">
           {/*Bin display and management*/}
-            <div className="flex-1 max-w-xl w-full m-auto border-2 p-4 rounded bg-gray-100 flex flex-col">
-                <h1 className="text-2xl font-bold mb-4 text-center">Your Bins</h1>
-                <ul className="flex-1 mb-4 space-y-2">
+            <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
+                <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Your Bins</h1>
+                <ul className=" mb-4 space-y-2">
                     {bins.map((bin, idx) => (
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${bins.length > 0 ? 
-                            'border pd-2 px-2 rounded' : ''}`
+                            'border-b border-dashed border-gray-300 py-2 text-lg' : ''}`
+
                         }>
                             <span>{bin.name} - {bin.percentage}%</span>
                             <button
@@ -103,12 +112,16 @@ export default function BinsPage() {
                         </li>
                     ))}
                 </ul>
-                <div className="flex flex-wrap gap-2">
+
+                <div className="flex flex-wrap gap-2 pb-2">
+
                     <input 
                         value={binName}
                         onChange={e => setBinName(e.target.value)}
                         placeholder="Bin Name"
-                        className="border p-2 rounded flex-1"
+
+                        className="border border-gray-200 p-2 rounded min-w-0 flex-grow"
+
                         maxLength={20}
                     />
                     <input
@@ -116,7 +129,9 @@ export default function BinsPage() {
                         onChange={e => setPercentage(e.target.value)}
                         placeholder="Percentage"
                         type="number"
-                        className="border p-2 rounded w-28"
+
+                        className="border border-gray-200 p-2 rounded w-28"
+
                     />
                     <button
                         onClick={handleAddBin}
@@ -127,9 +142,12 @@ export default function BinsPage() {
             </div>
             
             {/* pie chart */}
-            <div className="flex-1 max-w-xl w-full m-auto p-4 rounded flex items-center justify-center">
+
+            <div className="flex-1 max-w-xl w-full m-auto p-4 rounded flex flex-col bg-white rounded-lg shadow-md">
+                <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Graph</h1>
                 {bins.length > 0 ? (
-                    <div className="w-80 h-80">
+                    <div className="w-80 h-80 mx-auto py-2">
+
                       <Pie data={data} options={options}/>
                     </div>
                 ) : (
