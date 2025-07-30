@@ -15,7 +15,6 @@ export function BinsProvider({children}) {
               });
               if (!res.ok) throw new Error('Failed to fetch bins');
                   const data = await res.json();
-                  console.log('Fetchd bins:', data);
                   setBins(data);
           } catch (error) {
               console.error('Error fetching bins:', error);
@@ -25,6 +24,7 @@ export function BinsProvider({children}) {
 
     // fetch bins when user changes (initial load)
     useEffect(() => {
+        if (!user) setBins([]);
         fetchBins();
     }, [user]);
     
