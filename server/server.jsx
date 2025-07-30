@@ -5,7 +5,8 @@ const dotenv = require('dotenv');
 
 
 const db = require('./models'); // Register models to sequelize
-const authRoutes = require('./routes/authRoutes'); // Fix path to match folder
+const authRoutes = require('./routes/authRoutes'); // Authorization routing
+const expenseRoutes = require('./routes/expenseRoutes'); // Expense routing
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/expenses', expenseRoutes); 
 
 // Sync database and start server
 db.sequelize.sync({ alter: true }).then(() => {
