@@ -48,6 +48,7 @@ export default function ExpensesPage() {
     };
 
     return (
+
         <div className="flex flex-col md:flex-row bg-gray-100 font-sans min-h-screen p-8 mt-5 gap-4">
             {/* Income list */}
             <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
@@ -56,6 +57,7 @@ export default function ExpensesPage() {
                     {income.map((inc, idx) => (
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${income.length > 0 ? 
+
                             'border-b border-dashed border-gray-300 py-2 text-lg' : ''}`
                         }>
                             <span>{inc.name} ${inc.amount}</span>
@@ -68,11 +70,13 @@ export default function ExpensesPage() {
                     ))}
                 </ul>
                 {/* Income Input */}
+
                 <div className="flex flex-wrap gap-2 pb-2">
                     <input
                         value={incomeName}
                         onChange={(e) => setIncomeName(e.target.value)}
                         placeholder="Income Name"
+
                         className="border border-gray-200 p-2 rounded min-w-0 flex-grow"
                         maxLength={20}
                     />
@@ -81,6 +85,7 @@ export default function ExpensesPage() {
                         onChange={(e) => setIncomeAmount(e.target.value)}
                         placeholder="Amount"
                         type="number"
+
                         className="border border-gray-200 p-2 rounded w-28"
                     />
                     <button
@@ -92,6 +97,7 @@ export default function ExpensesPage() {
             </div>
 
             {/* Expenses list */}
+
             <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
                 <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Expenses</h1>
                 <ul className=" mb-4 space-y-2">
@@ -99,6 +105,7 @@ export default function ExpensesPage() {
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${expenses.length > 0 ? 
                             'border-b border-dashed border-gray-300 py-2 text-lg' : ''}`
+
                         }>
                             <span>{exp.name} -${exp.amount}</span>
                             <button
@@ -110,12 +117,15 @@ export default function ExpensesPage() {
                     ))}
                 </ul>
                 {/* Expense Input */}
+
                 <div className="flex flex-wrap gap-2 pb-2">
                     <input
                         value={expenseName}
                         onChange={(e) => setExpenseName(e.target.value)}
                         placeholder="Expense Name"
+
                         className="border border-gray-200 p-2 rounded min-w-0 flex-grow"
+
                         maxLength={20}
                     />
                     <input
@@ -123,7 +133,9 @@ export default function ExpensesPage() {
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="Amount"
                         type="number"
+
                         className="border border-gray-200 p-2 rounded w-28"
+
                     />
                     <button
                         onClick={handleAddExpense}

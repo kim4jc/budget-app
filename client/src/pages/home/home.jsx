@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../../context/authcontext/expensecontext.jsx'; // Import useExpenses context
 import { useBins } from '../../context/authcontext/binscontext.jsx';
@@ -250,6 +251,7 @@ export default function HomePage() {
                     {/* Daily Spending */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Daily Spend</h2>
+
                         {/* Calculate and display today's total spending based on 'expenses' */}
                         <p className="text-3xl font-bold text-gray-900 mb-2">
                           ${(expenses
@@ -264,6 +266,7 @@ export default function HomePage() {
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Expense History</h2>
                         <ul className="list-none p-0 m-0">
+
                             {/* Dynamically rendered Expense History Items */}
                             {expenseHistoryItems.length > 0 ? (
                                 expenseHistoryItems.map((item, index) => (
@@ -282,6 +285,7 @@ export default function HomePage() {
 
                 {/* Center Panel: Bar Chart */}
                 <div className="flex-grow bg-white p-6 rounded-lg shadow-md flex justify-center items-center min-h-[300px]">
+
                     <div className="w-full h-full max-w-2xl max-h-[400px]">
                         {dynamicBarData.labels.length > 0 && dynamicBarData.datasets.length > 0 ? (
                             <Bar data={dynamicBarData} options={barOptions} />
@@ -289,10 +293,12 @@ export default function HomePage() {
                             <p className="text-xl text-gray-500">Add expenses to see your spending history!</p>
                         )}
                     </div>
+
                 </div>
 
                 {/* Right Panel: Bins Button & Pie Chart */}
                 <div className="flex flex-col gap-5 md:w-1/3 lg:w-1/4">
+
 
                     {/* Pie Chart */}
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-center items-center min-h-[300px]">

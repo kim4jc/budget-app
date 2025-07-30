@@ -70,12 +70,14 @@ export default function BinsPage() {
     };
 
     const options = {
+
         responsive: true,
         plugins: {
             legend: {
                 desiplay: true,
                 position: 'bottom',
             },
+
             tooltip: {
                 callbacks: {
                     label: function(context) {
@@ -89,6 +91,7 @@ export default function BinsPage() {
     }
 
     return (
+
         <div className="min-h-screen p-8 flex flex-col md:flex-row font-sans bg-gray-100 text-gray-800 mt-5 gap-4">
           {/*Bin display and management*/}
             <div className="flex-1 max-w-xl w-full m-auto p-4 flex flex-col bg-white rounded-lg shadow-md">
@@ -98,6 +101,7 @@ export default function BinsPage() {
                         <li key={idx} 
                             className={`flex justify-between mb-2 ${bins.length > 0 ? 
                             'border-b border-dashed border-gray-300 py-2 text-lg' : ''}`
+
                         }>
                             <span>{bin.name} - {bin.percentage}%</span>
                             <button
@@ -108,12 +112,16 @@ export default function BinsPage() {
                         </li>
                     ))}
                 </ul>
+
                 <div className="flex flex-wrap gap-2 pb-2">
+
                     <input 
                         value={binName}
                         onChange={e => setBinName(e.target.value)}
                         placeholder="Bin Name"
+
                         className="border border-gray-200 p-2 rounded min-w-0 flex-grow"
+
                         maxLength={20}
                     />
                     <input
@@ -121,7 +129,9 @@ export default function BinsPage() {
                         onChange={e => setPercentage(e.target.value)}
                         placeholder="Percentage"
                         type="number"
+
                         className="border border-gray-200 p-2 rounded w-28"
+
                     />
                     <button
                         onClick={handleAddBin}
@@ -132,10 +142,12 @@ export default function BinsPage() {
             </div>
             
             {/* pie chart */}
+
             <div className="flex-1 max-w-xl w-full m-auto p-4 rounded flex flex-col bg-white rounded-lg shadow-md">
                 <h1 className="text-xl font-semibold text-blue-700 pb-3 mb-4 text-left border-b border-gray-200">Graph</h1>
                 {bins.length > 0 ? (
                     <div className="w-80 h-80 mx-auto py-2">
+
                       <Pie data={data} options={options}/>
                     </div>
                 ) : (

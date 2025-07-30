@@ -1,4 +1,5 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
+
 import { useAuth } from '../authcontext/authcontext.jsx';
 
 const ExpenseContext = createContext();
@@ -6,34 +7,35 @@ const ExpenseContext = createContext();
 export function ExpenseProvider({children}) {
     const { user, setUser } = useAuth();
 
-    //mock adding/removing expenses using setUser until backend is setup
-    const addExpense = (name, amount) => {
-        //Added 'date' and parsed 'amount' ---
-        const newExpense = {
-            name,
-            amount: parseFloat(amount), // Ensure amount is a number for calculations
-            date: new Date().toISOString() // Store current date/time as ISO string
-        };
+    const [expenses, setExpenses] = useState(user?.expenses ?? []);
 
-        // Ensure user and user.expenses exist before attempting to spread
-        setUser(prevUser => {
-            const currentExpenses = prevUser?.expenses || []; // Handle case where expenses might be undefined
-            return {
-                ...prevUser,
-                expenses: [...currentExpenses, newExpense]
-            };
-        });
+    const addExpense = async (name, amount) => {
+        try {
+            const payload = { name, amount: parseFloat(amount) };
+            const response = await fetch('/api/expenses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const newExpense = await response.json();
+            setExpenses(prev => [...prev, newExpense]);
+
+        } catch (error) {
+            console.error('Caught error in addExpense:', error);
+            alert('Error adding expense');
+        }
     };
 
     const removeExpense = (name) => {
-        setUser(prevUser => ({
-            ...prevUser,
-            expenses: prevUser.expenses.filter(expense => expense.name !== name)
-        }));
+        setExpenses(prev => prev.filter(expense => expense.name !== name));
     };
 
     return (
-        <ExpenseContext.Provider value={{ expenses: user?.expenses ?? [], addExpense, removeExpense }}>
+        <ExpenseContext.Provider value={{ expenses, addExpense, removeExpense }}>
+
             {children}
         </ExpenseContext.Provider>
     );
@@ -41,4 +43,6 @@ export function ExpenseProvider({children}) {
 
 export function useExpenses() {
     return useContext(ExpenseContext)
+
 }
+
