@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/authcontext/authcontext.jsx';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,10 +6,16 @@ import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
 
-    const { login, register } = useAuth();
+    const { user, login, register } = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/home');
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,7 +32,7 @@ export default function LoginPage() {
                 else{
                     //if successful navigate to home
                     alert('Login Successful')
-                    navigate('/');
+                    navigate('/home');
                 }
             } 
             //if trying to register
@@ -43,7 +49,7 @@ export default function LoginPage() {
                     const loginData = await login(username, password);
                     console.log('Auto-login after register response:', loginData);
                     if(loginData){
-                        navigate('/');
+                        navigate('/home');
                         } 
                         else {
                             alert('Auto-login after registration failed. Please try logging in.');
