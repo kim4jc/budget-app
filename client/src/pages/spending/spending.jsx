@@ -74,7 +74,7 @@ export default function BinsPage() {
         responsive: true,
         plugins: {
             legend: {
-                desiplay: true,
+                display: true,
                 position: 'bottom',
             },
 
@@ -105,7 +105,7 @@ export default function BinsPage() {
                         }>
                             <span>{bin.name} - {bin.percentage}%</span>
                             <button
-                                onClick={() => removeBin(bin.name)}
+                                onClick={() => removeBin(bin.name, bin.percentage)}
                                 className="text-red-500 hover:underline">
                                 Remove
                             </button>

@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const db = require('./models'); // Register models to sequelize
 const authRoutes = require('./routes/authRoutes'); // Authorization routing
 const expenseRoutes = require('./routes/expenseRoutes'); // Expense routing
+const binRoutes = require('./routes/binRoutes'); // Bin Routing
 
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRoutes); 
+app.use('/api/bins', binRoutes);
 
 // Sync database and start server
 

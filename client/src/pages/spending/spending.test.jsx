@@ -117,6 +117,6 @@ describe('BinsPage', () => {
         );
 
         fireEvent.click(screen.getByText(/Remove/i));
-        expect(mockRemoveBin).toHaveBeenCalledWith('Travel');
+        expect(mockRemoveBin).toHaveBeenCalledWith('Travel', 30);
       });
 });
