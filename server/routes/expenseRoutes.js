@@ -2,9 +2,9 @@
 
 const express = require('express');
 const router = express.Router();
-const expenseController = require('../controllers/expenseController');
+const expenseController = require('../controllers/expenseController.js');
 
-router.post('/', expenseController.addExpense);
+router.post('/createExpense', expenseController.addExpense);
 
 module.exports = router;
 

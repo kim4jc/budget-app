@@ -12,14 +12,14 @@ export function ExpenseProvider({children}) {
     const addExpense = async (name, amount) => {
         try {
             const payload = { name, amount: parseFloat(amount) };
-            const response = await fetch('/api/expenses', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/createExpense`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
-
             const newExpense = await response.json();
             setExpenses(prev => [...prev, newExpense]);
 

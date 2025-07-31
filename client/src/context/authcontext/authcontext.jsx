@@ -1,10 +1,36 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const checkAuth = async () => {
+      try {
+        // Call backend endpoint to verify token & get user info
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/checkAuth`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+  
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          setUser(null); // no valid token or logged out
+        }
+      } catch (err) {
+        console.error('Auth check failed', err);
+        setUser(null);
+      }
+      setLoading(false);
+    };
+  
+    useEffect(() => {
+      checkAuth();
+    }, []);
   
     const login = async (username, password) => {
       //call backend endpoint to login user
@@ -66,7 +92,7 @@ export function AuthProvider({ children }) {
 
   
     return (
-      <AuthContext.Provider value={{ user, login, logout, register}}>
+      <AuthContext.Provider value={{ user, setUser, loading, login, logout, register}}>
         {children}
       </AuthContext.Provider>
     );

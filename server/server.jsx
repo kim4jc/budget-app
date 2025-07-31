@@ -44,7 +44,8 @@ app.use('/api/bins', binRoutes);
 
 // Sync database and start server
 
-db.sequelize.sync({ alter: true }).then(() => {
+//db.sequelize.sync({ alter: true }).then(() => {
+db.sequelize.sync().then(() => {
 
   const PORT = process.env.BACKEND_PORT || 4000;
   app.listen(PORT, () => {

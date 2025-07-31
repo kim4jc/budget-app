@@ -113,3 +113,18 @@ exports.logoutUser = (req, res) => {
   });
   return res.status(200).json({ message: 'Logged out successfully' });
 };
+
+exports.checkAuth = (req, res) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    // Return user info decoded from the token
+    return res.status(200).json({ user: { id: decoded.id, username: decoded.username } });
+  });
+};
