@@ -1,18 +1,38 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect} from 'react';
 
 import { useAuth } from '../authcontext/authcontext.jsx';
 
 const ExpenseContext = createContext();
 
 export function ExpenseProvider({children}) {
-    const { user, setUser } = useAuth();
+    const { user } = useAuth();
 
     const [expenses, setExpenses] = useState(user?.expenses ?? []);
+
+    // Fetch all expenses when component mounts
+    useEffect(() => {
+        const fetchExpenses = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses`, {
+            method: 'GET',
+            credentials: 'include'
+            });
+            const data = await response.json();
+            setExpenses(data);
+        } catch (err) {
+            console.error('Error fetching expenses:', err);
+        }
+        };
+
+        if (user) {
+        fetchExpenses();
+        }
+    }, [user]);
 
     const addExpense = async (name, amount) => {
         try {
             const payload = { name, amount: parseFloat(amount) };
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/createExpense`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -29,13 +49,21 @@ export function ExpenseProvider({children}) {
         }
     };
 
-    const removeExpense = (name) => {
-        setExpenses(prev => prev.filter(expense => expense.name !== name));
-    };
+    const removeExpense = async (id) => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      setExpenses(prev => prev.filter(expense => expense.id !== id));
+    } catch (err) {
+      console.error('Error deleting expense:', err);
+      alert('Failed to delete expense');
+    }
+  };
 
     return (
         <ExpenseContext.Provider value={{ expenses, addExpense, removeExpense }}>
-
             {children}
         </ExpenseContext.Provider>
     );
