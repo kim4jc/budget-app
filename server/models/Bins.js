@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }, 
     userID: {
         type: DataTypes.INTEGER,
-        allowNull: true, // Should be false when authentication is implemented
+        allowNull: false,
         references: {
             model: 'Users', // Reference to the User model
             key: 'id', // Foreign key in the Bins table
