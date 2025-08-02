@@ -62,7 +62,7 @@ export default function ExpensesPage() {
                         }>
                             <span>{inc.name} ${inc.amount}</span>
                             <button
-                                onClick={() => removeIncome(inc.name)}
+                                onClick={() => removeIncome(inc.id)}
                                 className="text-red-500 hover:underline">
                                 Remove
                             </button>
@@ -109,7 +109,7 @@ export default function ExpensesPage() {
                         }>
                             <span>{exp.name} -${exp.amount}</span>
                             <button
-                                onClick={() => removeExpense(exp.name)}
+                                onClick={() => removeExpense(exp.id)}
                                 className="text-red-500 hover:underline">
                                 Remove
                             </button>

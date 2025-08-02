@@ -1,7 +1,7 @@
 // Expenses table
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Expenses = sequelize.define('Expenses', {
+  const Expense = sequelize.define('Expense', {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }, 
     userID: {
         type: DataTypes.INTEGER,
-        allowNull: true, // Should be false when authenication is implemented
+        allowNull: false, 
         references: {
             model: 'Users', // Reference to the User model
             key: 'id', // Foreign key in the Expenses table
@@ -20,10 +20,10 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
 
-  //Associate Expenses with User
-  Expenses.associate = (models) => {
-    Expenses.belongsTo(models.User, { foreignKey: 'userID' }); 
+  //Associate Expense with User
+  Expense.associate = (models) => {
+    Expense.belongsTo(models.User, { foreignKey: 'userID' }); 
   }
 
-  return Expenses;
+  return Expense;
 };
