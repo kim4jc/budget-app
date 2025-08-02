@@ -1,5 +1,6 @@
 // Bins Controller
 
+
 const { Bins } = require('../models');
 const jwt = require('jsonwebtoken');
 const sequelize = require('../config/database');
@@ -8,20 +9,28 @@ const dotenv = require('dotenv');
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Helper function to get the user ID from the JWT token
-const getUserIdFromToken = (token, res) => {
+
+function getUserIdFromRequest(req) {
+    const { token } = req.cookies;
+    if (!token) return null;
+
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         return decoded.id;
     } catch (err) {
+
         res.status(401).json({ message: "Invalid token" });
         return null;
     }
 };
 
+
 // GET /api/bins
 exports.getBins = async (req, res) => {
+    const userID = getUserIdFromRequest(req);
+    if (!userID) return res.status(401).json({ error: 'Unauthorized' });
     try {
+
         const { token } = req.cookies;
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -32,6 +41,7 @@ exports.getBins = async (req, res) => {
 
         const bins = await Bins.findAll({ where: { userID } });
         res.status(200).json(bins);
+
     } catch (error) {
         console.error('Error in getBins:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -40,6 +50,8 @@ exports.getBins = async (req, res) => {
 
 // POST /api/bins
 exports.addBin = async (req, res) => {
+    const userID = getUserIdFromRequest(req);
+    if (!userID) return res.status(401).json({ error: 'Unauthorized' });
     try {
         const { token } = req.cookies;
         if (!token) {
@@ -64,11 +76,14 @@ exports.addBin = async (req, res) => {
 
 // DELETE /api/bins/:id
 exports.removeBin = async (req, res) => {
+    const userID = getUserIdFromRequest(req);
+    if (!userID) return res.status(401).json({ error: 'Unauthorized' });
     try {
         const { token } = req.cookies;
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
         }
+
 
         const userID = getUserIdFromToken(token, res);
         if (!userID) return;
@@ -76,6 +91,7 @@ exports.removeBin = async (req, res) => {
         const binID = req.params.id;
 
         const bin = await Bins.findOne({ where: { id: binID, userID } });
+
         if (!bin) {
             return res.status(404).json({ error: 'Bin not found or unauthorized' });
         }

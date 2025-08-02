@@ -4,7 +4,7 @@ import { useAuth } from '../authcontext/authcontext.jsx';
 const BinsContext = createContext();
 
 export function BinsProvider({children}) {
-    const { user, setUser } = useAuth();
+    const { user } = useAuth();
     const [bins, setBins] = useState([]);
 
     const fetchBins = async () => {
@@ -24,8 +24,11 @@ export function BinsProvider({children}) {
 
     // fetch bins when user changes (initial load)
     useEffect(() => {
-        if (!user) setBins([]);
-        fetchBins();
+        if (user) {
+            fetchBins(); // fetch bins only when useris present 
+        } else {
+            setBins([]); // clear bins when user logs out
+        }
     }, [user]);
     
     // add bin: Post to backend, update local state on success
