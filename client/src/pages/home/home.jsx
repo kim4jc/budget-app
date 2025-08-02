@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useBins } from '../../context/authcontext/binscontext.jsx';
-import { useIncome } from '../../context/authcontext/incomecontext.jsx'; // Import the useIncome hook
+import { useIncome } from '../../context/authcontext/incomecontext.jsx';
 import { Pie, Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -32,7 +32,7 @@ const formatDateShort = (date) => {
     return new Date(date).toLocaleDateString('en-US', options);
 };
 
-// Helper function to get days of the current week (Sunday to Saturday)
+// Helper function to get days of the current week
 const getWeekDays = (referenceDate = new Date()) => {
     const today = new Date(referenceDate);
     today.setHours(0,0,0,0);
@@ -50,10 +50,9 @@ const getWeekDays = (referenceDate = new Date()) => {
 };
 
 export default function HomePage() {
-    // We will now manage our own expenses state here, fetched directly from the API
     const [expenses, setExpenses] = useState([]);
     const { bins } = useBins();
-    // NEW: Use the income context to get income data
+    // Use the income context to get income data
     const { income } = useIncome();
     const [currentWeekDates, setCurrentWeekDates] = useState([]);
     const [dynamicBarData, setDynamicBarData] = useState({
@@ -62,9 +61,9 @@ export default function HomePage() {
     });
     const [expenseHistoryItems, setExpenseHistoryItems] = useState([]);
 
-    // NEW STATE: Daily spending target, starting with a default value.
+    // Daily spending target, starting with a default value
     const [dailySpendingTarget, setDailySpendingTarget] = useState(50);
-    // NEW STATE: Calculate and store the total savings
+    // Calculate and store the total savings
     const [totalSavings, setTotalSavings] = useState(0);
 
     // Function to calculate daily totals from actual expenses
@@ -101,7 +100,7 @@ export default function HomePage() {
                 const data = await response.json();
                 setExpenses(data); // Set the local expenses state
 
-                // Prepare data for Expense History: Get 3 most recent transactions
+                // Get 3 most recent transactions
                 const sortedTransactions = [...data].sort((a, b) => {
                     const dateA = new Date(a.createdAt);
                     const dateB = new Date(b.createdAt);
@@ -111,14 +110,13 @@ export default function HomePage() {
 
             } catch (err) {
                 console.error('Error fetching and processing expenses:', err);
-                // Optionally, handle error state for the user
             }
         };
 
         fetchExpenses();
     }, []); // Empty dependency array means this runs only once on mount
 
-    // NEW useEffect: This will re-run whenever 'expenses', 'income', or 'dailySpendingTarget' changes
+    // useEffect: This will re-run whenever 'expenses', 'income', or 'dailySpendingTarget' changes
     useEffect(() => {
         // Calculate total savings
         const totalIncome = income.reduce((sum, inc) => sum + inc.amount, 0);
@@ -157,7 +155,7 @@ export default function HomePage() {
         setDynamicBarData(newBarData);
     }, [expenses, dailySpendingTarget, income]); // Added 'income' to the dependency array
 
-    // --- Pie Chart Data and Options (unchanged) ---
+    // Pie Chart Data and Options
     const totalPercent = bins.reduce((sum, bin) => sum + bin.percentage, 0);
     const remaining = Math.max(0, 100 - totalPercent);
 
@@ -278,7 +276,7 @@ export default function HomePage() {
                 {/* Left Panel: Daily Spending, Spending Target & Expense History */}
                 <div className="flex flex-col gap-5 md:w-1/3 lg:w-1/4">
 
-                    {/* NEW: Daily Spending field - MOVED FROM RIGHT PANEL */}
+                    {/*Daily Spending field */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Daily Spend</h2>
                         <p className="text-3xl font-bold text-gray-900 mb-2">
@@ -324,7 +322,7 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                {/* Center Panel: Bar Chart */}
+                {/* Bar Chart */}
                 <div className="flex-grow bg-white p-6 rounded-lg shadow-md flex justify-center items-center min-h-[300px]">
                     <div className="w-full h-full max-w-2xl max-h-[400px]">
                         {dynamicBarData.labels.length > 0 && dynamicBarData.datasets.length > 0 ? (
@@ -335,10 +333,10 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                {/* Right Panel: Savings & Pie Chart */}
+                {/* Savings & Pie Chart */}
                 <div className="flex flex-col gap-5 md:w-1/3 lg:w-1/4">
 
-                    {/* MOVED: Savings Field - MOVED FROM LEFT PANEL */}
+                    {/* Savings Field */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Savings</h2>
                         <p className="text-3xl font-bold text-gray-900 mb-2">
