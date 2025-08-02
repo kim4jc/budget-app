@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
+import { useExpenses } from '../../context/authcontext/expensecontext.jsx'; // Import useExpenses context
 import { useBins } from '../../context/authcontext/binscontext.jsx';
-import { useIncome } from '../../context/authcontext/incomecontext.jsx'; // Import the useIncome hook
 import { Pie, Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -33,28 +34,27 @@ const formatDateShort = (date) => {
 };
 
 // Helper function to get days of the current week (Sunday to Saturday)
-const getWeekDays = (referenceDate = new Date()) => {
-    const today = new Date(referenceDate);
-    today.setHours(0,0,0,0);
-    const currentDayOfWeek = today.getDay();
+const getWeekDays = (referenceDate = new Date()) => { // Added referenceDate parameter
+    const today = new Date(referenceDate); // Use the reference date
+    today.setHours(0,0,0,0); // Normalize to start of day (important for daily comparisons)
+    const currentDayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, etc.
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - currentDayOfWeek);
+    startOfWeek.setDate(today.getDate() - currentDayOfWeek); // Go back to Sunday at 00:00:00
 
     const days = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
-        days.push(date);
+        days.push(date); // Add the Date object for each day
     }
-    return days;
+    return days; // Returns an array of Date objects for Sun, Mon, ..., Sat
 };
 
 export default function HomePage() {
-    // We will now manage our own expenses state here, fetched directly from the API
-    const [expenses, setExpenses] = useState([]);
+    // Get expenses from context
+    const { expenses } = useExpenses();
     const { bins } = useBins();
-    // NEW: Use the income context to get income data
-    const { income } = useIncome();
+
     const [currentWeekDates, setCurrentWeekDates] = useState([]);
     const [dynamicBarData, setDynamicBarData] = useState({
         labels: [],
@@ -62,81 +62,42 @@ export default function HomePage() {
     });
     const [expenseHistoryItems, setExpenseHistoryItems] = useState([]);
 
-    // NEW STATE: Daily spending target, starting with a default value.
-    const [dailySpendingTarget, setDailySpendingTarget] = useState(50);
-    // NEW STATE: Calculate and store the total savings
-    const [totalSavings, setTotalSavings] = useState(0);
-
     // Function to calculate daily totals from actual expenses
     const calculateDailyTotalsFromExpenses = (allExpenses, weekDates) => {
-        const dailyTotals = Array(7).fill(0);
+        const dailyTotals = Array(7).fill(0); // Initialize with 0 for each day
         const weekStartMs = weekDates[0].getTime();
+        // End of Saturday (inclusive)
         const weekEndMs = weekDates[6].getTime() + (24 * 60 * 60 * 1000) - 1;
 
         allExpenses.forEach(exp => {
-            const expenseDate = new Date(exp.createdAt);
+            const expenseDate = new Date(exp.date); // Convert ISO string back to Date object
             const expenseTimeMs = expenseDate.getTime();
 
+            // Check if expense falls within the current week
             if (expenseTimeMs >= weekStartMs && expenseTimeMs <= weekEndMs) {
-                const dayOfWeek = expenseDate.getDay();
+                const dayOfWeek = expenseDate.getDay(); // 0 for Sun, 1 for Mon, etc.
                 dailyTotals[dayOfWeek] += exp.amount;
             }
         });
         return dailyTotals;
     };
 
-    // useEffect to fetch expenses from the API once on mount
+    // Use useEffect to react to changes in 'expenses'
     useEffect(() => {
-        const fetchExpenses = async () => {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses`, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch expenses');
-                }
-
-                const data = await response.json();
-                setExpenses(data); // Set the local expenses state
-
-                // Prepare data for Expense History: Get 3 most recent transactions
-                const sortedTransactions = [...data].sort((a, b) => {
-                    const dateA = new Date(a.createdAt);
-                    const dateB = new Date(b.createdAt);
-                    return dateB.getTime() - dateA.getTime();
-                });
-                setExpenseHistoryItems(sortedTransactions.slice(0, 3));
-
-            } catch (err) {
-                console.error('Error fetching and processing expenses:', err);
-                // Optionally, handle error state for the user
-            }
-        };
-
-        fetchExpenses();
-    }, []); // Empty dependency array means this runs only once on mount
-
-    // NEW useEffect: This will re-run whenever 'expenses', 'income', or 'dailySpendingTarget' changes
-    useEffect(() => {
-        // Calculate total savings
-        const totalIncome = income.reduce((sum, inc) => sum + inc.amount, 0);
-        const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-        setTotalSavings(totalIncome - totalExpenses);
-
-        const weekDates = getWeekDays();
+        const weekDates = getWeekDays(); // Get current week dates
         setCurrentWeekDates(weekDates);
 
+        // Filter and process expenses for the bar chart
         const spendingValues = calculateDailyTotalsFromExpenses(expenses, weekDates);
+        const dailySpendingTarget = 50; // Your test value for the dotted line
 
         const newBarData = {
-            labels: weekDates.map(date => date.toDateString()),
+            labels: weekDates.map(date => date.toDateString()), // Use full date string as internal label
             datasets: [
                 {
                     type: 'bar',
                     label: 'Daily Spending',
-                    data: spendingValues,
+                    data: spendingValues, // Use calculated totals
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1,
@@ -155,7 +116,15 @@ export default function HomePage() {
             ]
         };
         setDynamicBarData(newBarData);
-    }, [expenses, dailySpendingTarget, income]); // Added 'income' to the dependency array
+
+        // Prepare data for Expense History: Get 3 most recent transactions
+        const sortedTransactions = [...expenses].sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateB.getTime() - dateA.getTime(); // Sort descending (most recent first)
+        });
+        setExpenseHistoryItems(sortedTransactions.slice(0, 3)); // Get top 3
+    }, [expenses]); // IMPORTANT: Add 'expenses' to dependency array so it re-runs when expenses change
 
     // --- Pie Chart Data and Options (unchanged) ---
     const totalPercent = bins.reduce((sum, bin) => sum + bin.percentage, 0);
@@ -249,12 +218,13 @@ export default function HomePage() {
                     text: 'Day of the Week'
                 },
                 ticks: {
+                    // X-axis labels
                     callback: function(value, index, ticks) {
                         const date = currentWeekDates[index];
                         if (date) {
                             const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                            const monthDate = formatDateShort(date);
-                            return [dayName, monthDate];
+                            const monthDate = formatDateShort(date); // e.g., "Jul 27"
+                            return [dayName, monthDate]; // Multiline label
                         }
                         return '';
                     }
@@ -275,46 +245,35 @@ export default function HomePage() {
             {/* Main Content */}
             <div className="flex flex-col md:flex-row p-5 gap-5 max-w-7xl mx-auto mt-5">
 
-                {/* Left Panel: Daily Spending, Spending Target & Expense History */}
+                {/* Left Panel: Daily Spending & Expense History */}
                 <div className="flex flex-col gap-5 md:w-1/3 lg:w-1/4">
 
-                    {/* NEW: Daily Spending field - MOVED FROM RIGHT PANEL */}
+                    {/* Daily Spending */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Daily Spend</h2>
+
+                        {/* Calculate and display today's total spending based on 'expenses' */}
                         <p className="text-3xl font-bold text-gray-900 mb-2">
                           ${(expenses
-                                .filter(exp => new Date(exp.createdAt).toDateString() === new Date().toDateString())
+                                .filter(exp => new Date(exp.date).toDateString() === new Date().toDateString())
                                 .reduce((sum, exp) => sum + exp.amount, 0)
                             ).toFixed(2)}
                         </p>
                         <p className="text-gray-600 text-lg">Total spending for today.</p>
                     </div>
 
-                    {/* Daily Spending Target */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Daily Spending Target</h2>
-                        <div className="flex items-center gap-2">
-                            <span className="text-2xl text-gray-800 font-bold">$</span>
-                            <input
-                                type="number"
-                                value={dailySpendingTarget}
-                                onChange={(e) => setDailySpendingTarget(parseFloat(e.target.value))}
-                                className="border border-gray-200 p-2 rounded w-full text-2xl"
-                                placeholder="e.g. 50"
-                                min="0"
-                            />
-                        </div>
-                    </div>
-
                     {/* Expense History */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Expense History</h2>
                         <ul className="list-none p-0 m-0">
+
+                            {/* Dynamically rendered Expense History Items */}
                             {expenseHistoryItems.length > 0 ? (
                                 expenseHistoryItems.map((item, index) => (
-                                    <li key={item.id}
+                                    // Use a unique key. If your expensecontext.jsx was updated with 'id', use item.id
+                                    <li key={item.id || `${item.name}-${item.amount}-${item.date}`}
                                         className={`py-2 ${index < expenseHistoryItems.length -1 ? 'border-b border-dashed border-gray-200' : ''} text-lg`}>
-                                        <span className="font-semibold">{new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}:</span> {item.name} - <span className="font-bold">${item.amount.toFixed(2)}</span>
+                                        <span className="font-semibold">{new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}:</span> {item.name} - <span className="font-bold">${item.amount.toFixed(2)}</span>
                                     </li>
                                 ))
                             ) : (
@@ -326,6 +285,7 @@ export default function HomePage() {
 
                 {/* Center Panel: Bar Chart */}
                 <div className="flex-grow bg-white p-6 rounded-lg shadow-md flex justify-center items-center min-h-[300px]">
+
                     <div className="w-full h-full max-w-2xl max-h-[400px]">
                         {dynamicBarData.labels.length > 0 && dynamicBarData.datasets.length > 0 ? (
                             <Bar data={dynamicBarData} options={barOptions} />
@@ -333,19 +293,12 @@ export default function HomePage() {
                             <p className="text-xl text-gray-500">Add expenses to see your spending history!</p>
                         )}
                     </div>
+
                 </div>
 
-                {/* Right Panel: Savings & Pie Chart */}
+                {/* Right Panel: Bins Button & Pie Chart */}
                 <div className="flex flex-col gap-5 md:w-1/3 lg:w-1/4">
 
-                    {/* MOVED: Savings Field - MOVED FROM LEFT PANEL */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold text-blue-700 pb-3 mb-4 border-b border-gray-200">Savings</h2>
-                        <p className="text-3xl font-bold text-gray-900 mb-2">
-                           ${totalSavings.toFixed(2)}
-                        </p>
-                        <p className="text-gray-600 text-lg">Your current total balance.</p>
-                    </div>
 
                     {/* Pie Chart */}
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-center items-center min-h-[300px]">
@@ -357,6 +310,7 @@ export default function HomePage() {
                             <p className="text-gray-500 text-lg">No bins to display</p>
                         )}
                     </div>
+
                 </div>
             </div>
         </div>
