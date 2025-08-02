@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../../context/authcontext/expensecontext.jsx'; // Import useExpenses context
 import { useBins } from '../../context/authcontext/binscontext.jsx';
