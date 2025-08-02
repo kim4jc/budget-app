@@ -1,41 +1,66 @@
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+// Bins Controller
+
+
 const { Bins } = require('../models');
+const jwt = require('jsonwebtoken');
+const sequelize = require('../config/database');
+const dotenv = require('dotenv');
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
+
 function getUserIdFromRequest(req) {
     const { token } = req.cookies;
     if (!token) return null;
+
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
         return decoded.id;
     } catch (err) {
-        console.error('Invalid token:', err);
+
+        res.status(401).json({ message: "Invalid token" });
         return null;
     }
-}
+};
 
-const testUserID = null; // hardcoded test user ID for now
 
+// GET /api/bins
 exports.getBins = async (req, res) => {
     const userID = getUserIdFromRequest(req);
     if (!userID) return res.status(401).json({ error: 'Unauthorized' });
     try {
-        const bins = await Bins.findAll({ where: { userID }});
-        res.json(bins);
+
+        const { token } = req.cookies;
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        const userID = getUserIdFromToken(token, res);
+        if (!userID) return;
+
+        const bins = await Bins.findAll({ where: { userID } });
+        res.status(200).json(bins);
+
     } catch (error) {
         console.error('Error in getBins:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
+// POST /api/bins
 exports.addBin = async (req, res) => {
     const userID = getUserIdFromRequest(req);
     if (!userID) return res.status(401).json({ error: 'Unauthorized' });
     try {
-        console.log('POST /api/bins called with:', req.body);
+        const { token } = req.cookies;
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
+        }
+
+        const userID = getUserIdFromToken(token, res);
+        if (!userID) return;
+
         const { name, percentage } = req.body;
         if (!name || percentage === undefined) {
             return res.status(400).json({ error: 'Name and percentage are required' });
@@ -49,21 +74,30 @@ exports.addBin = async (req, res) => {
     }
 };
 
+// DELETE /api/bins/:id
 exports.removeBin = async (req, res) => {
     const userID = getUserIdFromRequest(req);
     if (!userID) return res.status(401).json({ error: 'Unauthorized' });
     try {
-        const { name, percentage } = req.query;
-        if (!name || percentage === undefined) {
-          return res.status(400).json({ error: 'Name and percentage are required' });
+        const { token } = req.cookies;
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized: No token provided" });
         }
 
-        const bin = await Bins.findOne({ where: { name, percentage, userID } });
+
+        const userID = getUserIdFromToken(token, res);
+        if (!userID) return;
+
+        const binID = req.params.id;
+
+        const bin = await Bins.findOne({ where: { id: binID, userID } });
+
         if (!bin) {
-          return res.status(404).json({ error: 'Bin not found' });
+            return res.status(404).json({ error: 'Bin not found or unauthorized' });
         }
+
         await bin.destroy();
-        res.json({ message: 'Bin removed' });
+        res.status(200).json({ message: 'Bin removed successfully' });
     } catch (error) {
         console.error('Error in removeBin:', error);
         res.status(500).json({ error: 'Internal server error' });
