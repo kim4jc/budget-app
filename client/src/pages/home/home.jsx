@@ -26,19 +26,19 @@ ChartJS.register(
     LineElement
 );
 
-// Helper function to format date (e.g., "Jul 27")
+// Helper function to format date
 const formatDateShort = (date) => {
     const options = { month: 'short', day: 'numeric' };
     return new Date(date).toLocaleDateString('en-US', options);
 };
 
-// Helper function to get days of the current week (Sunday to Saturday)
-const getWeekDays = (referenceDate = new Date()) => { // Added referenceDate parameter
-    const today = new Date(referenceDate); // Use the reference date
-    today.setHours(0,0,0,0); // Normalize to start of day (important for daily comparisons)
-    const currentDayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, etc.
+// Helper function to get days of the current week
+const getWeekDays = (referenceDate = new Date()) => {
+    const today = new Date(referenceDate);
+    today.setHours(0,0,0,0);
+    const currentDayOfWeek = today.getDay();
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - currentDayOfWeek); // Go back to Sunday at 00:00:00
+    startOfWeek.setDate(today.getDate() - currentDayOfWeek);
 
     const days = [];
     for (let i = 0; i < 7; i++) {
@@ -123,9 +123,9 @@ export default function HomePage() {
             return dateB.getTime() - dateA.getTime(); // Sort descending (most recent first)
         });
         setExpenseHistoryItems(sortedTransactions.slice(0, 3)); // Get top 3
-    }, [expenses]); // IMPORTANT: Add 'expenses' to dependency array so it re-runs when expenses change
+    }, [expenses]);
 
-    // --- Pie Chart Data and Options (unchanged) ---
+    // Pie Chart Data and Options
     const totalPercent = bins.reduce((sum, bin) => sum + bin.percentage, 0);
     const remaining = Math.max(0, 100 - totalPercent);
 
@@ -295,11 +295,8 @@ export default function HomePage() {
 
                 </div>
 
-                {/* Right Panel: Bins Button & Pie Chart */}
+                {/* Pie Chart */}
                 <div className="flex flex-col gap-5 md:w-1/3 lg:w-1/4">
-
-
-                    {/* Pie Chart */}
                     <div className="bg-white p-6 rounded-lg shadow-md flex justify-center items-center min-h-[300px]">
                         {bins.length > 0 || remaining > 0 ? (
                             <div className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
@@ -309,7 +306,6 @@ export default function HomePage() {
                             <p className="text-gray-500 text-lg">No bins to display</p>
                         )}
                     </div>
-
                 </div>
             </div>
         </div>
